@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fakeeyes/gate"
 	"fakeeyes/helloworld"
-	"fakeeyes/videogate"
 
 	"github.com/liangdas/mqant"
 	"github.com/liangdas/mqant/log"
@@ -27,7 +27,8 @@ func main() {
 	)
 	err = app.Run( //模块都需要加到入口列表中传入框架
 		helloworld.Module(),
-		videogate.Module(),
+		gate.Module(),
+		// videogate.Module(),
 	)
 	if err != nil {
 		log.Error(err.Error())
