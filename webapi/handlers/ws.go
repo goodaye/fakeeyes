@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -84,6 +85,7 @@ func (c *Client) Read() {
 
 	for {
 		_, message, err := c.Socket.ReadMessage()
+		fmt.Println(string(message))
 		if err != nil {
 			Manager.Unregister <- c
 			c.Socket.Close()
@@ -99,6 +101,7 @@ func (c *Client) Write() {
 		c.Socket.Close()
 	}()
 
+	c.Socket.WriteJSON("abc")
 	for {
 		select {
 		case message, ok := <-c.Send:
@@ -115,7 +118,8 @@ func (c *Client) Write() {
 // WsPage is a websocket handler
 func WsPage(c *gin.Context) {
 	// change the reqest to websocket model
-	conn, error := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}).Upgrade(c.Writer, c.Request, nil)
+
+	conn, error := WSUpgrader.Upgrade(c.Writer, c.Request, nil)
 	if error != nil {
 		http.NotFound(c.Writer, c.Request)
 		return
@@ -123,7 +127,7 @@ func WsPage(c *gin.Context) {
 	// websocket connect
 	client := &Client{ID: uuid.NewV4().String(), Socket: conn, Send: make(chan []byte)}
 
-	Manager.Register <- client
+	// Manager.Register <- client
 
 	go client.Read()
 	go client.Write()
