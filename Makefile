@@ -2,8 +2,8 @@ GOCC=go
 #GC_FLAGS= 
 
 TARGET = bin/fakeeyes
-M_PREFIX = src
-M_SRC = main.go
+M_PREFIX = 
+M_SRC = app/*.go
 # PROJECT = skyflow
 
 MAIN_PKG = cmd 
