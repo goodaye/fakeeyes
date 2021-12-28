@@ -1,0 +1,2 @@
+./bin/fakeeyes -f ./bin/config.toml syncdb 
+./bin/fakeeyes -f ./bin/config.toml dropdb 
