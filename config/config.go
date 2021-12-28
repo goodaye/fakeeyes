@@ -5,10 +5,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// DBConfig config for database
+type DBConfig struct {
+	Datasource  string `json:"Datasource"`
+	MaxIdleConn int    `json:"MaxIdleConn"`
+	MaxOpenConn int    `json:"MaxOpenConn"`
+	SQLLog      bool   `json:"SQLLog"`
+}
+
 type Config struct {
 	HTTP struct {
 		Port int `json:"Port"`
 	} `json:"HTTP"`
+	MetaDB DBConfig `json:"MetaDB"`
 }
 
 var (
