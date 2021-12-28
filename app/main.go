@@ -26,6 +26,10 @@ func main() {
 
 	fmt.Println("command : ", command)
 	switch command {
+	case "syncdb":
+		err = SyncDB()
+	case "dropdb":
+		err = DropDB()
 	case "startweb":
 		err = StartWeb()
 	// case "syncdb":
@@ -40,26 +44,6 @@ func main() {
 		fmt.Println(err.Error())
 	}
 }
-
-// // SyncDB  syncdb
-// func SyncDB() error {
-// 	err := wire.Init()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	err = db.GetModel().SyncDB()
-// 	return err
-// }
-
-// // DropDB  dropdb
-// func DropDB() error {
-// 	err := wire.Init()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	err = db.GetModel().DropDB()
-// 	return err
-// }
 
 // _ParseOption  解析命令行参数
 func _ParseOption() {

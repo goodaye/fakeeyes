@@ -1,2 +1,8 @@
 [HTTP]
 Port = 8080
+
+[MetaDB]
+Datasource  = "root:ukNcQ(4678rH@tcp(9.134.35.158:3306)/fakeeyes?charset=utf8"
+MaxIdleConn =  200
+MaxOpenConn = 200
+SQLLog  =  true 

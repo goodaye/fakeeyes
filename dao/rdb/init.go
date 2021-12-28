@@ -55,3 +55,10 @@ func NewSession() *xorm.Session {
 func Engine() *xorm.Engine {
 	return GetModel().GetEngine()
 }
+
+func SyncDB() error {
+	return defaultModel.SyncDB()
+}
+func DropDB() error {
+	return defaultModel.DropDB()
+}

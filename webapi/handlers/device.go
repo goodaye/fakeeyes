@@ -1,19 +1,28 @@
 package handlers
 
-import "github.com/goodaye/fakeeyes/pkg/ginhandler"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/goodaye/fakeeyes/pkg/ginhandler"
+)
 
-type Devcie struct {
+type DevcieHandler struct {
 	ginhandler.BaseHandler
 }
 
-func (d Devcie) Register() {
+//Router
+func (h DevcieHandler) Router(rg *gin.RouterGroup) {
+	rg.POST("/Login", h.Login)
 
 }
 
-func (d Devcie) HeartBeat() {
+func (d DevcieHandler) Login(c *gin.Context) {
 
 }
 
-func (d Devcie) Connect() {
+func (d DevcieHandler) HeartBeat() {
+
+}
+
+func (d DevcieHandler) Connect() {
 
 }
