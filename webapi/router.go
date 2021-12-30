@@ -6,13 +6,13 @@ import "github.com/goodaye/fakeeyes/webapi/handlers"
 
 func InitHandler() {
 
-	user := app.Group("/User")
-	{
-		handlers.UserHandler{}.Router(user)
-	}
-	device := app.Group("/Device")
-	{
-		handlers.DevcieHandler{}.Router(device)
-	}
+	// api
+	app.GET("/ping", handlers.Handler{}.Pong)
+	app.GET("/api/version", handlers.Handler{}.Version)
 
+	// API for system call
+	api := app.Group("/api/v1")
+	{
+		handlers.UserHandler{}.Router(api)
+	}
 }
