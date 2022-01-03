@@ -41,6 +41,34 @@ func Login(req request.UserLogin) (user User, err error) {
 	return
 }
 
+func UserSignUp(req request.UserSignUp) (user User, err error) {
+
+	var dbuser db.User
+
+	var has bool
+	session := rdb.NewSession()
+	defer session.Close()
+
+	has, err = session.Where("name = ?", req.Name).Get(&dbuser)
+	if err != nil {
+		return
+	}
+	if has {
+		err = service.ErrorUserExist
+		return
+	}
+	newuser := db.User{
+		Name:      req.Name,
+		LastLogin: time.Now(),
+	}
+	_, err = session.Insert(&newuser)
+	if err != nil {
+		return
+	}
+	session.Commit()
+	return
+}
+
 func (user *User) CreateToken() (err error) {
 
 	var dbsession db.UserSession

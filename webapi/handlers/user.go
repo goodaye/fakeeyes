@@ -35,7 +35,7 @@ func (h UserHandler) Login(c *gin.Context) {
 	}
 	u, err := user.Login(rs)
 	if err != nil {
-		h.SendFailure(c, "LoginError", err)
+		h.SendFailure(c, HTTPErrorCode.RequestForbidben, err)
 		return
 	}
 	h.SendSuccess(c, u)
@@ -53,5 +53,17 @@ func (h UserHandler) SignOut(c *gin.Context) {
 
 // 注册
 func (h UserHandler) SignUp(c *gin.Context) {
+	var err error
+	var rs = request.UserSignUp{}
+	err = h.UnmarshalPost(c, &rs)
+	if err != nil {
+		return
+	}
+	u, err := user.UserSignUp(rs)
+	if err != nil {
+		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
+		return
+	}
+	h.SendSuccess(c, u)
 
 }
