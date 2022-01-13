@@ -13,11 +13,12 @@ type DevcieHandler struct {
 func (h DevcieHandler) Router(rg *gin.RouterGroup) {
 	device := rg.Group("/Device")
 	{
-		device.POST("/Login", h.Login)
+		device.POST("/Register", h.Register)
+
 	}
 }
 
-func (d DevcieHandler) Login(c *gin.Context) {
+func (d DevcieHandler) Register(c *gin.Context) {
 
 }
 

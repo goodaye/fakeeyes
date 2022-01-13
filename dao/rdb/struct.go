@@ -1,13 +1,6 @@
-package db
+package rdb
 
 import "time"
-
-// ID          int       `json:"id" xorm:"not null pk autoincr INT"`
-// Name        string    `json:"name" xorm:"not null unique VARCHAR(255) comment('产品名称')"`
-// BizModules  string    `json:"biz_modules" xorm:"not null  VARCHAR(1024) comment('产品关联模块')"`
-// Admin       string    `json:"admin" xorm:"VARCHAR(255)  comment('产品admin')"`
-// GmtModified time.Time `json:"gmt_modified" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP updated" `
-// GmtCreated  time.Time `json:"gmt_created" xorm:"not null default '1970-01-01 08:00:01' TIMESTAMP created" `
 
 // User user
 type User struct {
@@ -32,16 +25,21 @@ type DeviceSession struct {
 
 // Device
 type Device struct {
-	ID           int64     `json:"id" xorm:"not null pk autoincr INT"`
-	SN           string    `json:"sn" xorm:"not null unique VARCHAR(255) comment('设备SN')"`
-	Name         string    `json:"name" xorm:"not null  VARCHAR(255) comment('设备名')"`
-	Type         string    `json:"type" xorm:" null  VARCHAR(255) comment('设备类型,比如4WD')"`
-	Class        string    `json:"class" xorm:" null  VARCHAR(255) comment('设备类型,比如,树莓派小车')"`
-	Manufacturer string    `json:"manufacturer" xorm:" null  VARCHAR(255) comment('设备制造商,比如,亚博')"`
-	Status       int       `json:"status" xorm:" null  VARCHAR(255) comment('设备制状态，比如，在线、离线')"`
-	LastLogin    time.Time `json:"last_login" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP comment('上次登陆时间')" `
-	GmtCreated   time.Time `json:"gmt_created" xorm:"not null default '1970-01-01 08:00:01' TIMESTAMP created" `
-	GmtModified  time.Time `json:"gmt_modified" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP updated" `
+	ID             int64     `json:"id" xorm:"not null pk autoincr INT"`
+	SN             string    `json:"sn" xorm:"not null unique VARCHAR(255) comment('设备SN')"`
+	Name           string    `json:"name" xorm:"not null  VARCHAR(255) comment('设备名')"`
+	ModelName      string    `json:"model_name" xorm:" null  VARCHAR(255) comment('设备名,比如树莓派/MacBook')"`
+	ModelID        string    `json:"model_id" xorm:" null  VARCHAR(255) comment('设备名,比如树莓派4B/MacBook16,1')"`
+	ProcessorName  string    `json:"processor_name" xorm:" null  VARCHAR(255) comment('处理器名字')"`
+	ProcessorSpeed string    `json:"processor_speed" xorm:" null  VARCHAR(255) comment('处理器速度')"`
+	Manufacturer   string    `json:"manufacturer" xorm:" null  VARCHAR(255) comment('设备制造商,比如,亚博')"`
+	OSName         string    `json:"os_name" xorm:" null  VARCHAR(255) comment('OS名字')"`
+	OSVersion      string    `json:"os_version" xorm:" null  VARCHAR(255) comment('OS Version')"`
+	HardwareUUID   string    `json:"hardware_uuid" xorm:" null  VARCHAR(255) comment('硬件UUID')"`
+	Status         int       `json:"status" xorm:" null  VARCHAR(255) comment('设备制状态，比如，在线、离线')"`
+	LastLogin      time.Time `json:"last_login" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP comment('上次登陆时间')" `
+	GmtCreated     time.Time `json:"gmt_created" xorm:"not null default '1970-01-01 08:00:01' TIMESTAMP created" `
+	GmtModified    time.Time `json:"gmt_modified" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP updated" `
 }
 
 // Room 房间

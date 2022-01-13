@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"github.com/goodaye/fakeeyes/config"
-	"github.com/goodaye/fakeeyes/protos/db"
 
 	//使用 mysql 驱动
 	_ "github.com/go-sql-driver/mysql"
@@ -17,9 +16,10 @@ var tableList []interface{}
 
 func init() {
 	tableList = []interface{}{
-		new(db.User),
-		new(db.Device),
-		new(db.Room),
+		new(User),
+		new(UserSession),
+		new(Device),
+		new(Room),
 	}
 }
 
