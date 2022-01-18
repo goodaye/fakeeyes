@@ -1,6 +1,8 @@
 package rdb
 
-import "time"
+import (
+	"time"
+)
 
 // User user
 type User struct {
@@ -21,6 +23,12 @@ type UserSession struct {
 }
 
 type DeviceSession struct {
+	ID          int64     `json:"id" xorm:"not null pk autoincr INT"`
+	UserID      int64     `json:"user_id" xorm:"not null BIGINT unique comment('用户ID')"`
+	Token       string    `json:"token" xorm:"not null  VARCHAR(255) unique comment('用户token')"`
+	ExpireTime  time.Time `json:"expire_time" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP" `
+	GmtCreated  time.Time `json:"gmt_created" xorm:"not null default '1970-01-01 08:00:01' TIMESTAMP created" `
+	GmtModified time.Time `json:"gmt_modified" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP updated" `
 }
 
 // Device
@@ -36,7 +44,8 @@ type Device struct {
 	OSName         string    `json:"os_name" xorm:" null  VARCHAR(255) comment('OS名字')"`
 	OSVersion      string    `json:"os_version" xorm:" null  VARCHAR(255) comment('OS Version')"`
 	HardwareUUID   string    `json:"hardware_uuid" xorm:" null  VARCHAR(255) comment('硬件UUID')"`
-	Status         int       `json:"status" xorm:" null  VARCHAR(255) comment('设备制状态，比如，在线、离线')"`
+	Status         int       `json:"status" xorm:" null  tinyint comment('设备制状态，比如，在线、离线')"`
+	Uptime         int64     `json:"up_time " xorm:" null INT64 comment('设备启动时间(单位秒)')"`
 	LastLogin      time.Time `json:"last_login" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP comment('上次登陆时间')" `
 	GmtCreated     time.Time `json:"gmt_created" xorm:"not null default '1970-01-01 08:00:01' TIMESTAMP created" `
 	GmtModified    time.Time `json:"gmt_modified" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP updated" `

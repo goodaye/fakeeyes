@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/goodaye/fakeeyes/pkg/ginhandler"
 	"github.com/goodaye/fakeeyes/protos/request"
@@ -15,13 +17,13 @@ type UserHandler struct {
 
 //Router
 func (h UserHandler) Router(rg *gin.RouterGroup) {
-	user := rg.Group("/User")
+	// 用户操作
+	rg.POST("/UserLogin", h.Login)
+	rg.POST("/UserSignIn", h.SignIn)
+	rg.POST("/UserSignUp", h.SignUp)
+	user := rg.Group("/User", h.CheckLoginStatus)
 	{
-
-		user.POST("/Login", h.Login)
-		user.POST("/SignIn", h.SignIn)
-		user.POST("/SignUp", h.SignUp)
-		user.POST("/ListDevice", h.SignUp)
+		user.POST("/ListDevices", h.SignUp)
 		user.POST("/ConnectDevice", h.SignUp)
 	}
 
@@ -74,5 +76,35 @@ func (h UserHandler) SignUp(c *gin.Context) {
 		return
 	}
 	h.SendSuccess(c, u)
+
+}
+
+//登陆状态检查
+func (h UserHandler) CheckLoginStatus(c *gin.Context) {
+
+	token := c.Request.Header.Get(HeaderKey.UserToken)
+	if token == "" {
+		h.SendFailure(c, HTTPErrorCode.RequestForbidben, fmt.Errorf("user need login"))
+		return
+	}
+	user, err := user.LoginByToken(token)
+	if err != nil {
+		h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
+		return
+	}
+	// 设置已经登陆用户到Context中
+	c.Set(ContextKey.LoginUser, user)
+}
+
+// ListDevices
+func (h UserHandler) ListDevices(c *gin.Context) {
+	user := c.MustGet(ContextKey.LoginUser).(user.User)
+	devs, err := user.ListDevices()
+	if err != nil {
+		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
+		return
+	}
+
+	h.SendSuccess(c, devs)
 
 }

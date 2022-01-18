@@ -14,3 +14,8 @@ type UserSignIn struct {
 type UserSignUp struct {
 	Name string `json:"name"`
 }
+
+//用户登陆检查头
+type UserLoginHeader struct {
+	Token string `json:"token"`
+}

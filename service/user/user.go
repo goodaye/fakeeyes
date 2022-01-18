@@ -42,6 +42,37 @@ func Login(req request.UserLogin) (user User, err error) {
 	return
 }
 
+// 通过token 验证用户
+func LoginByToken(token string) (user User, err error) {
+
+	var dbuser rdb.User
+	var dbusersession rdb.UserSession
+	var has bool
+	session := rdb.NewSession()
+	defer session.Close()
+
+	has, err = session.Where("token = ?", token).Get(&dbusersession)
+	if err != nil {
+		return
+	}
+	if !has {
+		err = service.ErrorUserNotFound
+		return
+	}
+	has, err = session.ID(dbusersession.UserID).Get(&dbuser)
+	if err != nil {
+		return
+	}
+	if !has {
+		err = service.ErrorUserNotFound
+		return
+	}
+	user.User = dbuser
+	user.Session = session
+	user.UserSession = dbusersession
+	return
+}
+
 // 注册
 func UserSignUp(req request.UserSignUp) (user User, err error) {
 
@@ -76,6 +107,7 @@ func (user *User) CreateToken() (err error) {
 
 	var dbsession rdb.UserSession
 	session := user.WithSession()
+	defer session.Close()
 
 	has, err := session.Where("user_id = ? ", user.User.ID).Get(&dbsession)
 	if err != nil {
@@ -118,5 +150,17 @@ func (user *User) CreateToken() (err error) {
 func GenToken() string {
 	u4 := uuid.NewV4()
 	return u4.String()
+
+}
+
+// ListDevices 列举设备列表
+func (user *User) ListDevices() ([]rdb.Device, error) {
+
+	var dbdevice []rdb.Device
+	var err error
+	session := user.WithSession()
+	defer session.Close()
+	err = session.Find(&dbdevice)
+	return dbdevice, err
 
 }
