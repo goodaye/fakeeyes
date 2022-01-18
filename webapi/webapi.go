@@ -14,16 +14,7 @@ func StartWeb() error {
 	}
 	app = gin.Default()
 	app.RemoveExtraSlash = true
-	// //检查static目录是否存在
-	// StaticFilePath := path.Join(DefaultTemplatePath, "static")
-	// fileinfo, err := os.Stat(StaticFilePath)
-	// if err != nil {
-	// 	return err
-	// }
-	// if !fileinfo.IsDir() {
-	// 	return handlers.ErrorPathIsNotDir
-	// }
-	// app.Static("/webapi/static", StaticFilePath)
+
 	InitHandler()
 
 	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
