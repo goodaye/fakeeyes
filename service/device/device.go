@@ -90,3 +90,34 @@ func (dev *Device) CheckLoginStatus() (err error) {
 
 	return nil
 }
+
+// 通过token 验证设备
+func LoginByToken(token string) (dev Device, err error) {
+
+	var dbuser rdb.Device
+	var dbusersession rdb.DeviceSession
+	var has bool
+	session := rdb.NewSession()
+	defer session.Close()
+
+	has, err = session.Where("token = ?", token).Get(&dbusersession)
+	if err != nil {
+		return
+	}
+	if !has {
+		err = service.ErrorUserNotFound
+		return
+	}
+	has, err = session.ID(dbusersession.UserID).Get(&dbuser)
+	if err != nil {
+		return
+	}
+	if !has {
+		err = service.ErrorUserNotFound
+		return
+	}
+	dev.Device = dbuser
+	dev.Session = session
+	dev.DeviceSession = dbusersession
+	return
+}
