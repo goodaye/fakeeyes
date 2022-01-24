@@ -14,5 +14,6 @@ func InitHandler() {
 	api := app.Group("/api/v1")
 	{
 		handlers.UserHandler{}.Router(api)
+		handlers.DevcieHandler{}.Router(api)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/goodaye/fakeeyes/dao/rdb"
+	"github.com/goodaye/fakeeyes/pkg/copy"
 	"github.com/goodaye/fakeeyes/pkg/uuid"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/service"
@@ -16,25 +17,35 @@ type Device struct {
 }
 
 // 登陆
-func Register(req request.DeviceInfo) (user Device, err error) {
+func Register(req request.DeviceInfo) (dev Device, err error) {
 
 	var dbdev rdb.Device
-
+	var updatedev rdb.Device
 	var has bool
 	session := rdb.NewSession()
 	defer session.Close()
 
-	has, err = session.Where("sn = ?", req.SN).Get(&dbdev)
+	has, err = session.Where("sn = ?", req.SN).Cols("id").Get(&dbdev)
 	if err != nil {
 		return
 	}
+
+	copy.StructCopy(req, &updatedev)
+
 	if !has {
-		err = service.ErrorUserNotFound
-		return
+		_, err = session.Insert(&updatedev)
+		if err != nil {
+			return
+		}
+	} else {
+		_, err = session.ID(dbdev.ID).Update(&updatedev)
+		if err != nil {
+			return
+		}
 	}
-	user.Device = dbdev
-	user.Session = session
-	err = user.CreateToken()
+	dev.Device = dbdev
+	dev.Session = session
+	err = dev.CreateToken()
 	if err != nil {
 		return
 	}

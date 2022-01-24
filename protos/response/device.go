@@ -1,9 +1,11 @@
 package response
 
-import "github.com/goodaye/fakeeyes/protos/request"
+import (
+	"github.com/goodaye/fakeeyes/protos/request"
+)
 
 type DeviceInfo struct {
-	request.DeviceInfo 
+	request.DeviceInfo
 	Status int
 	Uptime int64
 }

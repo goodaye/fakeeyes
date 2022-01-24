@@ -19,6 +19,7 @@ func init() {
 		new(User),
 		new(UserSession),
 		new(Device),
+		new(DeviceSession),
 		new(Room),
 	}
 }

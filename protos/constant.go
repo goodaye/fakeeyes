@@ -7,3 +7,9 @@ var DevicePlatform = struct {
 }{
 	Darwin: "darwin",
 }
+
+var APIName = struct {
+	RegisterDevice string
+}{
+	RegisterDevice: "RegisterDevice",
+}
