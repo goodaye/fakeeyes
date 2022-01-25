@@ -20,7 +20,9 @@ type Device struct {
 func Register(req request.DeviceInfo) (dev Device, err error) {
 
 	var dbdev rdb.Device
-	var updatedev rdb.Device
+	var updatedev = rdb.Device{
+		LastLogin: time.Now(),
+	}
 	var has bool
 	session := rdb.NewSession()
 	defer session.Close()
@@ -33,6 +35,8 @@ func Register(req request.DeviceInfo) (dev Device, err error) {
 	copy.StructCopy(req, &updatedev)
 
 	if !has {
+		uuid := uuid.CreateUUID()
+		updatedev.UUID = uuid
 		_, err = session.Insert(&updatedev)
 		if err != nil {
 			return

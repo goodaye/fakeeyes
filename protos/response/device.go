@@ -1,11 +1,21 @@
 package response
 
-import (
-	"github.com/goodaye/fakeeyes/protos/request"
-)
-
 type DeviceInfo struct {
-	request.DeviceInfo
-	Status int
-	Uptime int64
+	SN             string
+	Name           string
+	ModelName      string
+	ModelID        string
+	ProcessorName  string
+	ProcessorSpeed string
+	Manufacturer   string
+	OSName         string
+	OSVersion      string
+	HardwareUUID   string
+	Status         int
+	Uptime         int64
 }
+
+// type ListDevices struct {
+// 	PageResponse
+// 	Devices []DeviceInfo
+// }

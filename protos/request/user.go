@@ -19,3 +19,19 @@ type UserSignUp struct {
 type UserLoginHeader struct {
 	Token string `json:"token"`
 }
+
+// 列出Room列表
+type ListRooms struct {
+	PageRequest
+}
+
+//
+type ListDevices struct {
+	PageRequest
+}
+
+//链接设备
+type ConnectDevice struct {
+	// UUID 设备的UUID
+	DeviceUUID string `json:"device_uuid"`
+}

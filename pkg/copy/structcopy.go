@@ -1,6 +1,7 @@
 package copy
 
 import (
+	"fmt"
 	"reflect"
 )
 
@@ -36,5 +37,46 @@ func StructCopy(src interface{}, dst interface{}) {
 		//  }
 		//
 		//}
+	}
+}
+
+func StructSliceCopy(src interface{}, dst interface{}) {
+
+	sv := reflect.ValueOf(src)
+	dv := reflect.ValueOf(dst).Elem()
+	fmt.Println(dv.Kind())
+	fmt.Println(dv.Type().Name())
+
+	if sv.Kind() != reflect.Slice {
+		return
+	}
+	// dst 必须是slice的指针，  *[]struct, 才能放入需要修改的添加的数据
+	if reflect.TypeOf(dst).Kind() != reflect.Ptr || reflect.TypeOf(dst).Elem().Kind() != reflect.Slice {
+		return
+	}
+	idt := reflect.TypeOf(dst).Elem().Elem()
+	ds := make([]reflect.Value, 0)
+	// dt := reflect.TypeOf(dst).Elem()
+	for i := 0; i < sv.Cap(); i++ {
+		fmt.Println(sv.Index(i))
+		iv := sv.Index(i)
+		n := reflect.New(idt)
+		copy(iv, n)
+		fmt.Println(n)
+		fmt.Println(n.Kind())
+		fmt.Println(n.Type().Name())
+		ds = append(ds, n.Elem())
+	}
+	dv.Set(reflect.Append(dv, ds...))
+}
+
+func copy(src, dst reflect.Value) {
+	vdst := dst.Elem()
+	for i := 0; i < src.NumField(); i++ {
+		//非指针field call isnil会panic，所以更推荐用下面注释掉的check是否为zero，另外reflect还有个deepequal。
+		dv := vdst.FieldByName(src.Type().Field(i).Name)
+		if !src.Field(i).IsZero() && dv.IsValid() && dv.CanSet() {
+			dv.Set(src.Field(i))
+		}
 	}
 }

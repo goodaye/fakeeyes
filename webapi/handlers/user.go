@@ -23,7 +23,7 @@ func (h UserHandler) Router(rg *gin.RouterGroup) {
 	rg.POST("/UserSignUp", h.SignUp)
 	user := rg.Group("/User", h.CheckLoginStatus)
 	{
-		user.POST("/ListDevices", h.SignUp)
+		user.POST("/ListDevices", h.ListDevices)
 		user.POST("/ConnectDevice", h.SignUp)
 	}
 
@@ -104,7 +104,18 @@ func (h UserHandler) ListDevices(c *gin.Context) {
 		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
 		return
 	}
+	var resp = []response.DeviceInfo{}
 
 	h.SendSuccess(c, devs)
+}
 
+// ConnectDevice connect to device
+func (h UserHandler) ConnectDevice(c *gin.Context) {
+
+	var err error
+	var rs = request.UserSignUp{}
+	err = h.UnmarshalPost(c, &rs)
+	if err != nil {
+		return
+	}
 }
