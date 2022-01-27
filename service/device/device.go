@@ -136,3 +136,8 @@ func LoginByToken(token string) (dev Device, err error) {
 	dev.DeviceSession = dbusersession
 	return
 }
+
+func DescribeDevice(req request.DescribeDevice) (dev *Device, err error) {
+
+	return nil, err
+}

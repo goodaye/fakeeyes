@@ -2,6 +2,7 @@ package response
 
 type DeviceInfo struct {
 	SN             string
+	UUID           string
 	Name           string
 	ModelName      string
 	ModelID        string

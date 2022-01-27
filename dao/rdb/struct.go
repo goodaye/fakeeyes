@@ -7,6 +7,7 @@ import (
 // User user
 type User struct {
 	ID          int64     `json:"id" xorm:"not null  pk autoincr INT"`
+	UID         string    `json:"uid" xorm:"not null  unique VARCHAR(255) comment('用户UID')"`
 	Name        string    `json:"name" xorm:"not null unique VARCHAR(255) comment('用户名')"`
 	LastLogin   time.Time `json:"last_login" xorm:"not null default CURRENT_TIMESTAMP TIMESTAMP" `
 	GmtCreated  time.Time `json:"gmt_created" xorm:"not null default '1970-01-01 08:00:01' TIMESTAMP created" `

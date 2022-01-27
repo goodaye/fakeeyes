@@ -1,2 +1,8 @@
 ./bin/fakeeyes -f ./bin/config.toml syncdb 
 ./bin/fakeeyes -f ./bin/config.toml dropdb 
+
+
+
+curl -XPOST  127.0.0.1:8080/api/v1/UserLogin -d '{"name":"mangtao"}'
+
+curl -XPOST 127.0.0.1:8080/api/v1/User/ListDevices -H "UserToken:87322126-9da6-4069-af5c-42e804a756cb"

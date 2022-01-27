@@ -1,14 +1,26 @@
 package user
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/goodaye/fakeeyes/dao/rdb"
+	"github.com/zheng-ji/goSnowFlake"
 
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/service"
 	uuid "github.com/satori/go.uuid"
 )
+
+var UIDWorker *goSnowFlake.IdWorker
+
+func init() {
+	var err error
+	UIDWorker, err = goSnowFlake.NewIdWorker(1)
+	if err != nil {
+		panic(err)
+	}
+}
 
 type User struct {
 	service.Entity
@@ -43,11 +55,12 @@ func Login(req request.UserLogin) (user User, err error) {
 }
 
 // 通过token 验证用户
-func LoginByToken(token string) (user User, err error) {
+func LoginByToken(token string) (user *User, err error) {
 
 	var dbuser rdb.User
 	var dbusersession rdb.UserSession
 	var has bool
+	user = &User{}
 	session := rdb.NewSession()
 	defer session.Close()
 
@@ -79,6 +92,7 @@ func UserSignUp(req request.UserSignUp) (user User, err error) {
 	var dbuser rdb.User
 
 	var has bool
+	var uid int64
 	session := rdb.NewSession()
 	defer session.Close()
 
@@ -90,11 +104,23 @@ func UserSignUp(req request.UserSignUp) (user User, err error) {
 		err = service.ErrorUserExist
 		return
 	}
-	newuser := rdb.User{
-		Name:      req.Name,
-		LastLogin: time.Now(),
+	for i := 0; i < 3; i++ {
+
+		uid, err = GetUID()
+		if err != nil {
+			continue
+		}
+		newuser := rdb.User{
+			UID:       fmt.Sprint(uid),
+			Name:      req.Name,
+			LastLogin: time.Now(),
+		}
+		_, err = session.Insert(&newuser)
+		if err != nil {
+			return
+		}
+		break
 	}
-	_, err = session.Insert(&newuser)
 	if err != nil {
 		return
 	}
@@ -163,4 +189,15 @@ func (user *User) ListDevices() ([]rdb.Device, error) {
 	err = session.Find(&dbdevice)
 	return dbdevice, err
 
+}
+
+func GetUID() (uid int64, err error) {
+
+	for i := 0; i < 3; i++ {
+		uid, err = UIDWorker.NextId()
+		if err != nil {
+			return
+		}
+	}
+	return
 }

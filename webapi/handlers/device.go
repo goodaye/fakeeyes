@@ -21,7 +21,10 @@ func (h DevcieHandler) Router(rg *gin.RouterGroup) {
 	device := rg.Group("/Device", h.CheckLoginStatus)
 	{
 		device.POST("/SendHeartBeat", h.Register)
-
+	}
+	ws := rg.Group("/Device", h.CheckLoginStatus)
+	{
+		ws.GET("Connect", h.Connect)
 	}
 }
 
@@ -68,6 +71,6 @@ func (h DevcieHandler) SendHeartBeat(c *gin.Context) {
 
 }
 
-func (h DevcieHandler) Connect() {
+func (h DevcieHandler) Connect(c *gin.Context) {
 
 }

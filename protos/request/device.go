@@ -13,3 +13,8 @@ type DeviceInfo struct {
 	OSVersion      string `json:"os_version" `
 	HardwareUUID   string `json:"hardware_uuid"`
 }
+
+type DescribeDevice struct {
+	UUID string `json:"uuid"`
+	SN   string `json:"sn"`
+}

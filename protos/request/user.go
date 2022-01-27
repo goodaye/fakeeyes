@@ -33,5 +33,5 @@ type ListDevices struct {
 //链接设备
 type ConnectDevice struct {
 	// UUID 设备的UUID
-	DeviceUUID string `json:"device_uuid"`
+	DeviceUUID string `json:"device_uuid" form:"device_uuid"`
 }
