@@ -1,4 +1,4 @@
-package device
+package service
 
 import (
 	"time"
@@ -7,17 +7,16 @@ import (
 	"github.com/goodaye/fakeeyes/pkg/copy"
 	"github.com/goodaye/fakeeyes/pkg/uuid"
 	"github.com/goodaye/fakeeyes/protos/request"
-	"github.com/goodaye/fakeeyes/service"
 )
 
 type Device struct {
-	service.Entity
+	Entity
 	rdb.Device
 	rdb.DeviceSession
 }
 
 // 登陆
-func Register(req request.DeviceInfo) (dev Device, err error) {
+func RegisterDevice(req request.DeviceInfo) (dev Device, err error) {
 
 	var dbdev rdb.Device
 	var updatedev = rdb.Device{
@@ -72,7 +71,7 @@ func (dev *Device) CreateToken() (err error) {
 		newdbss := rdb.DeviceSession{
 			UserID:     dev.Device.ID,
 			Token:      token,
-			ExpireTime: time.Now().Add(service.UserTokenExpireDuration),
+			ExpireTime: time.Now().Add(UserTokenExpireDuration),
 		}
 		_, err = session.Insert(newdbss)
 		if err != nil {
@@ -83,7 +82,7 @@ func (dev *Device) CreateToken() (err error) {
 		// 更新现有的
 		updatedbss := rdb.DeviceSession{
 			Token:      token,
-			ExpireTime: time.Now().Add(service.UserTokenExpireDuration),
+			ExpireTime: time.Now().Add(UserTokenExpireDuration),
 		}
 		_, err = session.ID(dbsession.ID).Update(&updatedbss)
 		if err != nil {
@@ -107,7 +106,7 @@ func (dev *Device) CheckLoginStatus() (err error) {
 }
 
 // 通过token 验证设备
-func LoginByToken(token string) (dev Device, err error) {
+func DeviceLoginByToken(token string) (dev Device, err error) {
 
 	var dbuser rdb.Device
 	var dbusersession rdb.DeviceSession
@@ -120,7 +119,7 @@ func LoginByToken(token string) (dev Device, err error) {
 		return
 	}
 	if !has {
-		err = service.ErrorUserNotFound
+		err = ErrorUserNotFound
 		return
 	}
 	has, err = session.ID(dbusersession.UserID).Get(&dbuser)
@@ -128,7 +127,7 @@ func LoginByToken(token string) (dev Device, err error) {
 		return
 	}
 	if !has {
-		err = service.ErrorUserNotFound
+		err = ErrorUserNotFound
 		return
 	}
 	dev.Device = dbuser

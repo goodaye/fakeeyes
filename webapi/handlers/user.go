@@ -2,15 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/goodaye/fakeeyes/pkg/copy"
 	"github.com/goodaye/fakeeyes/pkg/ginhandler"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/protos/response"
-	"github.com/goodaye/fakeeyes/service/room"
-	"github.com/goodaye/fakeeyes/service/user"
+	"github.com/goodaye/fakeeyes/service"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -54,7 +53,7 @@ func (h UserHandler) Login(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	u, err := user.Login(rs)
+	u, err := service.Login(rs)
 	if err != nil {
 		h.SendFailure(c, HTTPErrorCode.RequestForbidben, err)
 		return
@@ -86,7 +85,7 @@ func (h UserHandler) SignUp(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	u, err := user.UserSignUp(rs)
+	u, err := service.UserSignUp(rs)
 	if err != nil {
 		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
 		return
@@ -103,7 +102,7 @@ func (h UserHandler) CheckLoginStatus(c *gin.Context) {
 		h.SendFailure(c, HTTPErrorCode.RequestForbidben, fmt.Errorf("user need login"))
 		return
 	}
-	user, err := user.LoginByToken(token)
+	user, err := service.LoginByToken(token)
 	if err != nil {
 		h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
 		return
@@ -122,7 +121,7 @@ func (h UserHandler) WSCheckLoginStatus(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	user, err := user.LoginByToken(token)
+	user, err := service.LoginByToken(token)
 	if err != nil {
 		// h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
 		conn.WriteMessage(websocket.CloseMessage, []byte(err.Error()))
@@ -135,7 +134,7 @@ func (h UserHandler) WSCheckLoginStatus(c *gin.Context) {
 
 // ListDevices
 func (h UserHandler) ListDevices(c *gin.Context) {
-	user := c.MustGet(ContextKey.LoginUser).(*user.User)
+	user := c.MustGet(ContextKey.LoginUser).(*service.User)
 	devs, err := user.ListDevices()
 	if err != nil {
 		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
@@ -150,30 +149,25 @@ func (h UserHandler) ListDevices(c *gin.Context) {
 func (h UserHandler) ConnectDevice(c *gin.Context) {
 
 	var err error
-	user := c.MustGet(ContextKey.LoginUser).(*user.User)
+	u := c.MustGet(ContextKey.LoginUser).(*service.User)
 	conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
-	device_uuid := c.Query("device_uuid")
-	if device_uuid == "" {
+	var req request.ConnectDevice
+	err = c.Bind(&req)
+	if err != nil {
+		h.WSAbort(c, err)
+	}
+	if req.DeviceUUID == "" {
 		h.WSAbort(c, fmt.Errorf("need argument device_uuid"))
 		return
 	}
 
-	_, err = room.CreateRoom(user, conn, device_uuid)
+	// _, err = room.CreateRoom(user, conn, req.DeviceUUID)
+	// if err != nil {
+	// 	h.WSAbort(c, err)
+	// }
+	_, err = u.ConnectDevice(req, conn)
 	if err != nil {
 		h.WSAbort(c, err)
 	}
-	go func() {
-
-		for {
-			_, message, err := conn.ReadMessage()
-			fmt.Println(time.Now(), string(message))
-			if err != nil {
-				conn.Close()
-				break
-			}
-			conn.WriteMessage(websocket.TextMessage, message)
-		}
-	}()
-	// websocket connect
-	// client := &Client{ID: uuid.NewV4().String(), Socket: conn, Send: make(chan []byte)}
+	conn.WriteMessage(websocket.TextMessage, []byte("connect to server success "))
 }

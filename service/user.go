@@ -1,14 +1,15 @@
-package user
+package service
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/goodaye/fakeeyes/dao/rdb"
+
+	"github.com/gorilla/websocket"
 	"github.com/zheng-ji/goSnowFlake"
 
 	"github.com/goodaye/fakeeyes/protos/request"
-	"github.com/goodaye/fakeeyes/service"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -23,7 +24,7 @@ func init() {
 }
 
 type User struct {
-	service.Entity
+	Entity
 	rdb.User
 	rdb.UserSession
 }
@@ -42,7 +43,7 @@ func Login(req request.UserLogin) (user User, err error) {
 		return
 	}
 	if !has {
-		err = service.ErrorUserNotFound
+		err = ErrorUserNotFound
 		return
 	}
 	user.User = dbuser
@@ -69,7 +70,7 @@ func LoginByToken(token string) (user *User, err error) {
 		return
 	}
 	if !has {
-		err = service.ErrorUserNotFound
+		err = ErrorUserNotFound
 		return
 	}
 	has, err = session.ID(dbusersession.UserID).Get(&dbuser)
@@ -77,7 +78,7 @@ func LoginByToken(token string) (user *User, err error) {
 		return
 	}
 	if !has {
-		err = service.ErrorUserNotFound
+		err = ErrorUserNotFound
 		return
 	}
 	user.User = dbuser
@@ -101,7 +102,7 @@ func UserSignUp(req request.UserSignUp) (user User, err error) {
 		return
 	}
 	if has {
-		err = service.ErrorUserExist
+		err = ErrorUserExist
 		return
 	}
 	for i := 0; i < 3; i++ {
@@ -145,7 +146,7 @@ func (user *User) CreateToken() (err error) {
 		newdbss := rdb.UserSession{
 			UserID:     user.User.ID,
 			Token:      token,
-			ExpireTime: time.Now().Add(service.UserTokenExpireDuration),
+			ExpireTime: time.Now().Add(UserTokenExpireDuration),
 		}
 		_, err = session.Insert(newdbss)
 		if err != nil {
@@ -156,7 +157,7 @@ func (user *User) CreateToken() (err error) {
 		// 更新现有的
 		updatedbss := rdb.UserSession{
 			Token:      token,
-			ExpireTime: time.Now().Add(service.UserTokenExpireDuration),
+			ExpireTime: time.Now().Add(UserTokenExpireDuration),
 		}
 		_, err = session.ID(dbsession.ID).Update(&updatedbss)
 		if err != nil {
@@ -171,6 +172,17 @@ func (user *User) CreateToken() (err error) {
 	session.Commit()
 	user.UserSession = dbsession
 	return
+}
+
+func (u *User) ConnectDevice(req request.ConnectDevice, conn *websocket.Conn) (nroom *Room, err error) {
+
+	nroom, err = CreateRoom(u, conn, req.DeviceUUID)
+	if err != nil {
+		return
+	}
+	nroom.Run()
+	return
+
 }
 
 func GenToken() string {

@@ -7,8 +7,7 @@ import (
 	"github.com/goodaye/fakeeyes/pkg/ginhandler"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/protos/response"
-	"github.com/goodaye/fakeeyes/service/device"
-	"github.com/goodaye/fakeeyes/service/user"
+	"github.com/goodaye/fakeeyes/service"
 )
 
 type DevcieHandler struct {
@@ -35,7 +34,7 @@ func (h DevcieHandler) Register(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	u, err := device.Register(rs)
+	u, err := service.RegisterDevice(rs)
 	if err != nil {
 		h.SendFailure(c, HTTPErrorCode.RequestForbidben, err)
 		return
@@ -58,7 +57,7 @@ func (h DevcieHandler) CheckLoginStatus(c *gin.Context) {
 		h.SendFailure(c, HTTPErrorCode.RequestForbidben, fmt.Errorf("user need login"))
 		return
 	}
-	user, err := user.LoginByToken(token)
+	user, err := service.LoginByToken(token)
 	if err != nil {
 		h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
 		return
