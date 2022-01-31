@@ -6,3 +6,10 @@
 curl -XPOST  127.0.0.1:8080/api/v1/UserLogin -d '{"name":"mangtao"}'
 
 curl -XPOST 127.0.0.1:8080/api/v1/User/ListDevices -H "UserToken:87322126-9da6-4069-af5c-42e804a756cb"
+
+
+
+
+# proto gen 
+PATH=$PATH:~/go/bin ../../protoc-3.19.4-osx-x86_64/bin/protoc   --proto_path=./protos/command --go_out=./protos/command   protos/command/command.proto 
+
