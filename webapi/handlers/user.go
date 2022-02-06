@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goodaye/fakeeyes/pkg/copy"
 	"github.com/goodaye/fakeeyes/pkg/ginhandler"
+	"github.com/goodaye/fakeeyes/protos"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/protos/response"
 	"github.com/goodaye/fakeeyes/service"
@@ -28,6 +29,7 @@ func (h UserHandler) Router(rg *gin.RouterGroup) {
 	{
 		user.POST("/ListDevices", h.ListDevices)
 	}
+	// ws := rg.Group("/User", h.CheckLoginStatus, WSUpgrade)
 	ws := rg.Group("/User", WSUpgrade, h.WSCheckLoginStatus)
 	{
 		// WebSocket
@@ -36,10 +38,10 @@ func (h UserHandler) Router(rg *gin.RouterGroup) {
 
 }
 
-func (h UserHandler) WSAbort(c *gin.Context, err error) {
+func (h UserHandler) WSAbort(c *gin.Context, aborterr error) {
 
 	conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
-	conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+	conn.WriteMessage(websocket.TextMessage, []byte(aborterr.Error()))
 	conn.Close()
 	c.Abort()
 }
@@ -97,7 +99,7 @@ func (h UserHandler) SignUp(c *gin.Context) {
 //登陆状态检查
 func (h UserHandler) CheckLoginStatus(c *gin.Context) {
 
-	token := c.Request.Header.Get(HeaderKey.UserToken)
+	token := c.Request.Header.Get(protos.HeaderKey.UserToken)
 	if token == "" {
 		h.SendFailure(c, HTTPErrorCode.RequestForbidben, fmt.Errorf("user need login"))
 		return
@@ -115,10 +117,11 @@ func (h UserHandler) CheckLoginStatus(c *gin.Context) {
 func (h UserHandler) WSCheckLoginStatus(c *gin.Context) {
 
 	conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
-	token := c.Request.Header.Get(HeaderKey.UserToken)
+	token := c.Request.Header.Get(protos.HeaderKey.UserToken)
 	if token == "" {
-		conn.WriteMessage(websocket.CloseMessage, []byte("user need login"))
-		c.Abort()
+		h.WSAbort(c, fmt.Errorf("user need login"))
+		// conn.WriteMessage(websocket.CloseMessage, []byte("user need login"))
+		// c.Abort()
 		return
 	}
 	user, err := service.LoginByToken(token)

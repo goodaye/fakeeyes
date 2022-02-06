@@ -13,3 +13,12 @@ var APIName = struct {
 }{
 	RegisterDevice: "RegisterDevice",
 }
+
+// Httpheader key
+var HeaderKey = struct {
+	UserToken   string
+	DeviceToken string
+}{
+	UserToken:   "UserToken",
+	DeviceToken: "DeviceToken",
+}

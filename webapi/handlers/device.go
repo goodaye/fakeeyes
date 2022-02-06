@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/goodaye/fakeeyes/pkg/ginhandler"
+	"github.com/goodaye/fakeeyes/protos"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/protos/response"
 	"github.com/goodaye/fakeeyes/service"
@@ -52,7 +53,7 @@ func (h DevcieHandler) Register(c *gin.Context) {
 //登陆状态检查
 func (h DevcieHandler) CheckLoginStatus(c *gin.Context) {
 
-	token := c.Request.Header.Get(HeaderKey.UserToken)
+	token := c.Request.Header.Get(protos.HeaderKey.UserToken)
 	if token == "" {
 		h.SendFailure(c, HTTPErrorCode.RequestForbidben, fmt.Errorf("user need login"))
 		return
