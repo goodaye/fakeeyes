@@ -165,12 +165,13 @@ func (user *User) CreateToken() (err error) {
 			return
 		}
 	}
-	_, err = session.Where("user_id = ? ", user.User.ID).Get(&dbsession)
+	var ndbsession rdb.UserSession
+	_, err = session.Where("user_id = ? ", user.User.ID).Get(&ndbsession)
 	if err != nil {
 		return err
 	}
 	session.Commit()
-	user.UserSession = dbsession
+	user.UserSession = ndbsession
 	return
 }
 

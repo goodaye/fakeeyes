@@ -3,7 +3,9 @@ package service
 import (
 	"fmt"
 
+	"github.com/goodaye/fakeeyes/protos/command"
 	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 // 房间模式
@@ -66,7 +68,7 @@ func CreateRoom(user *User, client_conn *websocket.Conn, device_sn string) (room
 
 func (r *Room) Run() {
 	r.StreamON()
-	r.StartCrossMatrix()
+	go r.StartCrossMatrix()
 }
 
 func (r *Room) Close() {
@@ -81,13 +83,18 @@ func (r *Room) StreamON() {
 			r.ClientConn.Close()
 		}()
 		for {
-			_, message, err := r.ClientConn.ReadMessage()
+			mt, message, err := r.ClientConn.ReadMessage()
+
 			if err != nil {
 				r.ClientConn.Close()
 				break
 			}
-			fmt.Println(string(message))
-			r.ClientIn <- message
+			if mt == websocket.TextMessage {
+				fmt.Println(string(message))
+			} else if mt == websocket.BinaryMessage {
+				r.ClientIn <- message
+			}
+
 		}
 
 	}()
@@ -102,7 +109,6 @@ func (r *Room) StreamON() {
 				r.ClientConn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
-
 			r.ClientConn.WriteMessage(websocket.TextMessage, message)
 		}
 	}()
@@ -151,6 +157,16 @@ func (r *Room) StartCrossMatrix() {
 	for {
 		select {
 		case message = <-r.ClientIn:
+			var err error
+			cmd := command.Command{}
+			err = proto.Unmarshal(message, &cmd)
+			if err != nil {
+				return
+			}
+			// 如果是设备命令，转发到设备出口
+			if cmd.Type != command.Command_Device {
+				break
+			}
 			switch r.Mode {
 			case Modes.Normal:
 				r.DeviceOut <- message

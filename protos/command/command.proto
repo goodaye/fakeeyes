@@ -20,6 +20,7 @@ message Command
     {
         int32 opcode = 1 ;
         int32 opvalue = 2 ;
+        string opmessage = 3 ;
     }
     // 消息类型， 
     Type  type = 1 ; 

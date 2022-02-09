@@ -116,7 +116,7 @@ func (h UserHandler) CheckLoginStatus(c *gin.Context) {
 //WebSocket登陆状态检查
 func (h UserHandler) WSCheckLoginStatus(c *gin.Context) {
 
-	conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
+	// conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
 	token := c.Request.Header.Get(protos.HeaderKey.UserToken)
 	if token == "" {
 		h.WSAbort(c, fmt.Errorf("user need login"))
@@ -127,8 +127,9 @@ func (h UserHandler) WSCheckLoginStatus(c *gin.Context) {
 	user, err := service.LoginByToken(token)
 	if err != nil {
 		// h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
-		conn.WriteMessage(websocket.CloseMessage, []byte(err.Error()))
-		c.Abort()
+		// conn.WriteMessage(websocket.CloseMessage, []byte(err.Error()))
+		// c.Abort()
+		h.WSAbort(c, err)
 		return
 	}
 	// 设置已经登陆用户到Context中
@@ -172,5 +173,8 @@ func (h UserHandler) ConnectDevice(c *gin.Context) {
 	if err != nil {
 		h.WSAbort(c, err)
 	}
-	conn.WriteMessage(websocket.TextMessage, []byte("connect to server success "))
+	err = conn.WriteMessage(websocket.TextMessage, []byte("connect to server success "))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

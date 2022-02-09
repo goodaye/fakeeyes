@@ -18,6 +18,6 @@ func WSUpgrade(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	conn.WriteMessage(websocket.TextMessage, []byte("connect to fakeeyes"))
+	conn.WriteMessage(websocket.TextMessage, []byte("connecting to fakeeyes"))
 	c.Set(ContextKey.WSConnection, conn)
 }
