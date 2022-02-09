@@ -158,13 +158,13 @@ func (r *Room) StartCrossMatrix() {
 		select {
 		case message = <-r.ClientIn:
 			var err error
-			cmd := command.Command{}
+			cmd := command.Operation{}
 			err = proto.Unmarshal(message, &cmd)
 			if err != nil {
 				return
 			}
 			// 如果是设备命令，转发到设备出口
-			if cmd.Type != command.Command_Device {
+			if cmd.Type != command.Operation_Device {
 				break
 			}
 			switch r.Mode {

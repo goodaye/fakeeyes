@@ -6,8 +6,8 @@ package tmp;
 option go_package= "../command";
 
 
-// 命令
-message Command 
+// 操作
+message Operation 
 {
     enum Type 
     {
@@ -16,7 +16,7 @@ message Command
         // 设备操作命令
         Device = 1 ;
     }
-    message Operation
+    message OperateData
     {
         int32 opcode = 1 ;
         int32 opvalue = 2 ;
@@ -25,7 +25,7 @@ message Command
     // 消息类型， 
     Type  type = 1 ; 
     // 消息内容
-    Operation data =2 ;
+    OperateData data =2 ;
 }
 
 
