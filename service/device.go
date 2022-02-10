@@ -33,6 +33,7 @@ func RegisterDevice(req request.DeviceInfo) (dev Device, err error) {
 	}
 
 	copy.StructCopy(req, &updatedev)
+	updatedev.Status = DeviceState.Online
 
 	if !has {
 		uuid := uuid.CreateUUID()

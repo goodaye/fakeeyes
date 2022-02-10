@@ -13,11 +13,13 @@ type ModeType int
 
 // 模式列表
 var Modes = struct {
-	Normal ModeType
-	Echo   ModeType
+	Normal    ModeType
+	Echo      ModeType
+	Broadcast ModeType
 }{
-	Normal: 1,
-	Echo:   2,
+	Normal:    1,
+	Echo:      2,
+	Broadcast: 3,
 }
 
 // 房间信息
@@ -39,29 +41,25 @@ type Room struct {
 	Mode       ModeType
 }
 
-func CreateRoom(user *User, client_conn *websocket.Conn, device_sn string) (room *Room, err error) {
+func CreateRoom(user *User, client_conn *websocket.Conn, device_uuid string) (room *Room, err error) {
 
-	// devcie, err := DescribeDevice(request.DescribeDevice{SN: device_sn})
-	// if err != nil {
-	// 	return
-	// }
-
-	// device_conn, ok := DeviceConnection[device_sn]
-	// if !ok {
-	// 	return nil, fmt.Errorf("device lost connection")
-	// }
+	deviceconn, ok := DeviceConns[device_uuid]
+	if !ok {
+		err = fmt.Errorf("device not online: device id : %s", device_uuid)
+		return
+	}
 
 	room = &Room{
 		Name:       fmt.Sprintf("%s's Room", user.Name),
 		User:       user,
 		Device:     nil,
 		ClientConn: client_conn,
-		DeviceConn: nil,
+		DeviceConn: deviceconn,
 		DeviceIn:   make(chan []byte),
 		DeviceOut:  make(chan []byte),
 		ClientIn:   make(chan []byte),
 		ClientOut:  make(chan []byte),
-		Mode:       Modes.Echo,
+		Mode:       Modes.Normal,
 	}
 	return
 }
@@ -125,7 +123,7 @@ func (r *Room) StreamON() {
 				return
 			}
 
-			r.DeviceConn.WriteMessage(websocket.TextMessage, message)
+			r.DeviceConn.WriteMessage(websocket.BinaryMessage, message)
 		}
 	}()
 

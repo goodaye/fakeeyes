@@ -5,7 +5,7 @@
 
 curl -XPOST  127.0.0.1:8080/api/v1/UserLogin -d '{"name":"mangtao"}'
 
-curl -XPOST 127.0.0.1:8080/api/v1/User/ListDevices -H "UserToken:87322126-9da6-4069-af5c-42e804a756cb"
+curl -XPOST 127.0.0.1:8080/api/v1/User/ListDevices -H "UserToken:4f7581f4-5256-41aa-8a67-d51ace1fa692"
 
 
 

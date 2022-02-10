@@ -15,5 +15,6 @@ func InitHandler() {
 	{
 		handlers.UserHandler{}.Router(api)
 		handlers.DevcieHandler{}.Router(api)
+		handlers.AdminHandler{}.Router(api)
 	}
 }
