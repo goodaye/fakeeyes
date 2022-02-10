@@ -7,6 +7,7 @@ import (
 	"github.com/goodaye/fakeeyes/pkg/copy"
 	"github.com/goodaye/fakeeyes/pkg/uuid"
 	"github.com/goodaye/fakeeyes/protos/request"
+	"github.com/gorilla/websocket"
 )
 
 type Device struct {
@@ -90,27 +91,47 @@ func (dev *Device) CreateToken() (err error) {
 			return
 		}
 	}
-	_, err = session.Where("user_id = ? ", dev.Device.ID).Get(&dbsession)
+	var ndbsession rdb.DeviceSession
+	_, err = session.Where("user_id = ? ", dev.Device.ID).Get(&ndbsession)
 	if err != nil {
 		return err
 	}
 	session.Commit()
-	dev.DeviceSession = dbsession
+	dev.DeviceSession = ndbsession
 	return
 }
 
-// 检查登陆状态
-func (dev *Device) CheckLoginStatus() (err error) {
+func (dev *Device) SendHeartBeat(req request.DeviceInfo) error {
 
+	session := rdb.NewSession()
+	defer session.Close()
+	var update rdb.Device
+	copy.StructCopy(req, &update)
+	update.Status = DeviceState.Online
+	update.LastLogin = time.Now()
+	_, err := session.ID(dev.Device.ID).Update(&update)
+	if err != nil {
+		return err
+	}
+	session.Commit()
+	return nil
+}
+
+// 设备链接到系统，保存链接
+func (dev *Device) Connect(conn *websocket.Conn) error {
+	devid := dev.Device.UUID
+	DeviceConns[devid] = conn
 	return nil
 }
 
 // 通过token 验证设备
-func DeviceLoginByToken(token string) (dev Device, err error) {
+func DeviceLoginByToken(token string) (dev *Device, err error) {
 
 	var dbuser rdb.Device
 	var dbusersession rdb.DeviceSession
 	var has bool
+
+	dev = &Device{}
 	session := rdb.NewSession()
 	defer session.Close()
 

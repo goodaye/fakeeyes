@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/goodaye/fakeeyes/pkg/copy"
-	"github.com/goodaye/fakeeyes/pkg/ginhandler"
 	"github.com/goodaye/fakeeyes/protos"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/protos/response"
@@ -16,7 +15,7 @@ import (
 
 // User
 type UserHandler struct {
-	ginhandler.BaseHandler
+	Handler
 }
 
 //Router
@@ -36,14 +35,6 @@ func (h UserHandler) Router(rg *gin.RouterGroup) {
 		ws.GET("/ConnectDevice", h.ConnectDevice)
 	}
 
-}
-
-func (h UserHandler) WSAbort(c *gin.Context, aborterr error) {
-
-	conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
-	conn.WriteMessage(websocket.TextMessage, []byte(aborterr.Error()))
-	conn.Close()
-	c.Abort()
 }
 
 // Login
@@ -120,15 +111,10 @@ func (h UserHandler) WSCheckLoginStatus(c *gin.Context) {
 	token := c.Request.Header.Get(protos.HeaderKey.UserToken)
 	if token == "" {
 		h.WSAbort(c, fmt.Errorf("user need login"))
-		// conn.WriteMessage(websocket.CloseMessage, []byte("user need login"))
-		// c.Abort()
 		return
 	}
 	user, err := service.LoginByToken(token)
 	if err != nil {
-		// h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
-		// conn.WriteMessage(websocket.CloseMessage, []byte(err.Error()))
-		// c.Abort()
 		h.WSAbort(c, err)
 		return
 	}
@@ -144,7 +130,7 @@ func (h UserHandler) ListDevices(c *gin.Context) {
 		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
 		return
 	}
-	var resp = []response.DeviceInfo{}
+	var resp = response.ListDevices{}
 	copy.StructSliceCopy(devs, &resp)
 	h.SendSuccess(c, resp)
 }
@@ -164,11 +150,6 @@ func (h UserHandler) ConnectDevice(c *gin.Context) {
 		h.WSAbort(c, fmt.Errorf("need argument device_uuid"))
 		return
 	}
-
-	// _, err = room.CreateRoom(user, conn, req.DeviceUUID)
-	// if err != nil {
-	// 	h.WSAbort(c, err)
-	// }
 	_, err = u.ConnectDevice(req, conn)
 	if err != nil {
 		h.WSAbort(c, err)

@@ -4,15 +4,15 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/goodaye/fakeeyes/pkg/ginhandler"
 	"github.com/goodaye/fakeeyes/protos"
 	"github.com/goodaye/fakeeyes/protos/request"
 	"github.com/goodaye/fakeeyes/protos/response"
 	"github.com/goodaye/fakeeyes/service"
+	"github.com/gorilla/websocket"
 )
 
 type DevcieHandler struct {
-	ginhandler.BaseHandler
+	Handler
 }
 
 //Router
@@ -20,9 +20,9 @@ func (h DevcieHandler) Router(rg *gin.RouterGroup) {
 	rg.POST("/RegisterDevice", h.Register)
 	device := rg.Group("/Device", h.CheckLoginStatus)
 	{
-		device.POST("/SendHeartBeat", h.Register)
+		device.POST("/SendHeartBeat", h.SendHeartBeat)
 	}
-	ws := rg.Group("/Device", h.CheckLoginStatus)
+	ws := rg.Group("/Device", WSUpgrade, h.WSCheckLoginStatus)
 	{
 		ws.GET("Connect", h.Connect)
 	}
@@ -51,26 +51,66 @@ func (h DevcieHandler) Register(c *gin.Context) {
 }
 
 //登陆状态检查
-func (h DevcieHandler) CheckLoginStatus(c *gin.Context) {
+func (h DevcieHandler) _CheckLoginStatus(c *gin.Context) (errcode string, err error) {
 
-	token := c.Request.Header.Get(protos.HeaderKey.UserToken)
+	token := c.Request.Header.Get(protos.HeaderKey.DeviceToken)
 	if token == "" {
-		h.SendFailure(c, HTTPErrorCode.RequestForbidben, fmt.Errorf("user need login"))
-		return
+		return HTTPErrorCode.RequestForbidben, fmt.Errorf("device need login")
 	}
-	user, err := service.LoginByToken(token)
+	dev, err := service.DeviceLoginByToken(token)
 	if err != nil {
-		h.SendFailure(c, HTTPErrorCode.InvalidQueryParameter, err)
-		return
+		return HTTPErrorCode.InvalidQueryParameter, err
 	}
 	// 设置已经登陆用户到Context中
-	c.Set(ContextKey.LoginUser, user)
+	c.Set(ContextKey.LoginDevice, dev)
+	return
 }
 
+func (h DevcieHandler) CheckLoginStatus(c *gin.Context) {
+
+	code, err := h._CheckLoginStatus(c)
+	if err != nil {
+		h.SendFailure(c, code, err)
+		return
+	}
+}
+
+//WebSocket登陆状态检查
+func (h DevcieHandler) WSCheckLoginStatus(c *gin.Context) {
+
+	_, err := h._CheckLoginStatus(c)
+	if err != nil {
+		h.WSAbort(c, err)
+		return
+	}
+}
+
+// SendHeartBeat 不会修改token，只是保持心跳
 func (h DevcieHandler) SendHeartBeat(c *gin.Context) {
-
+	var err error
+	dev := c.MustGet(ContextKey.LoginDevice).(*service.Device)
+	var rs = request.DeviceInfo{}
+	err = h.UnmarshalPost(c, &rs)
+	if err != nil {
+		return
+	}
+	err = dev.SendHeartBeat(rs)
+	if err != nil {
+		h.SendFailure(c, HTTPErrorCode.ProcessDataError, err)
+		return
+	}
 }
-
 func (h DevcieHandler) Connect(c *gin.Context) {
+	var err error
+	dev := c.MustGet(ContextKey.LoginDevice).(*service.Device)
+	conn := c.MustGet(ContextKey.WSConnection).(*websocket.Conn)
 
+	err = dev.Connect(conn)
+	if err != nil {
+		h.WSAbort(c, err)
+	}
+	err = conn.WriteMessage(websocket.TextMessage, []byte("connect to server success "))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

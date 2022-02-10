@@ -171,7 +171,8 @@ func (r *Room) StartCrossMatrix() {
 			case Modes.Normal:
 				r.DeviceOut <- message
 			case Modes.Echo:
-				r.ClientOut <- message
+				echomsg := fmt.Sprintf("receive command")
+				r.ClientOut <- []byte(echomsg)
 			}
 		case message = <-r.DeviceIn:
 			r.ClientOut <- message

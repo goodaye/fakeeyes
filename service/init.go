@@ -11,7 +11,7 @@ var RoomPool map[string]*Room
 var poolsize = 100
 
 // 设备链接池管理
-var DeviceConnection = map[string]*websocket.Conn{}
+var DeviceConns = map[string]*websocket.Conn{}
 
 func init() {
 

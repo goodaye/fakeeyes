@@ -201,6 +201,9 @@ func (user *User) ListDevices() ([]rdb.Device, error) {
 	defer session.Close()
 	err = session.Find(&dbdevice)
 	return dbdevice, err
+}
+
+func (user *User) ListRooms() {
 
 }
 
