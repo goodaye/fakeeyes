@@ -16,18 +16,20 @@ message Operation
         // 设备操作命令
         Device = 1 ;
     }
-    message OperateData
-    {
-        int32 opcode = 1 ;
-        int32 opvalue = 2 ;
-        string opmessage = 3 ;
-    }
+
     // 消息类型， 
     Type  type = 1 ; 
     // 消息内容
-    OperateData data =2 ;
+    bytes data =2 ;
 }
 
+
+message DeviceOperation
+{
+    int32 opcode = 1 ;
+    int32 opvalue = 2 ;
+    string opmessage = 3 ;
+}
 
 // 操作码代码
 enum OperateCode 

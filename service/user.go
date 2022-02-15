@@ -203,6 +203,9 @@ func (user *User) ListDevices() ([]rdb.Device, error) {
 	return dbdevice, err
 }
 
+
+
+
 func (user *User) ListRooms() {
 
 }
