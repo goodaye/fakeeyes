@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 //声明 包名
-package tmp;
+package command;
 
 option go_package= "../command";
 

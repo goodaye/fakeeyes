@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rcommand.proto\x12\x03tmp\"`\n\tOperation\x12!\n\x04type\x18\x01 \x01(\x0e\x32\x13.tmp.Operation.Type\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\"\n\x04Type\x12\x0e\n\nConnection\x10\x00\x12\n\n\x06\x44\x65vice\x10\x01\"E\n\x0f\x44\x65viceOperation\x12\x0e\n\x06opcode\x18\x01 \x01(\x05\x12\x0f\n\x07opvalue\x18\x02 \x01(\x05\x12\x11\n\topmessage\x18\x03 \x01(\t*b\n\x0bOperateCode\x12\x0b\n\x07NonCode\x10\x00\x12\x0c\n\x08TurnLeft\x10\x65\x12\r\n\tTurnRight\x10\x66\x12\r\n\tMoveFront\x10g\x12\x0c\n\x08MoveBack\x10h\x12\x0c\n\x08MoveStop\x10iB\x0cZ\n../commandb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rcommand.proto\x12\x07\x63ommand\"d\n\tOperation\x12%\n\x04type\x18\x01 \x01(\x0e\x32\x17.command.Operation.Type\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\"\n\x04Type\x12\x0e\n\nConnection\x10\x00\x12\n\n\x06\x44\x65vice\x10\x01\"E\n\x0f\x44\x65viceOperation\x12\x0e\n\x06opcode\x18\x01 \x01(\x05\x12\x0f\n\x07opvalue\x18\x02 \x01(\x05\x12\x11\n\topmessage\x18\x03 \x01(\t*b\n\x0bOperateCode\x12\x0b\n\x07NonCode\x10\x00\x12\x0c\n\x08TurnLeft\x10\x65\x12\r\n\tTurnRight\x10\x66\x12\r\n\tMoveFront\x10g\x12\x0c\n\x08MoveBack\x10h\x12\x0c\n\x08MoveStop\x10iB\x0cZ\n../commandb\x06proto3')
 
 _OPERATECODE = DESCRIPTOR.enum_types_by_name['OperateCode']
 OperateCode = enum_type_wrapper.EnumTypeWrapper(_OPERATECODE)
@@ -33,14 +33,14 @@ _OPERATION_TYPE = _OPERATION.enum_types_by_name['Type']
 Operation = _reflection.GeneratedProtocolMessageType('Operation', (_message.Message,), {
   'DESCRIPTOR' : _OPERATION,
   '__module__' : 'command_pb2'
-  # @@protoc_insertion_point(class_scope:tmp.Operation)
+  # @@protoc_insertion_point(class_scope:command.Operation)
   })
 _sym_db.RegisterMessage(Operation)
 
 DeviceOperation = _reflection.GeneratedProtocolMessageType('DeviceOperation', (_message.Message,), {
   'DESCRIPTOR' : _DEVICEOPERATION,
   '__module__' : 'command_pb2'
-  # @@protoc_insertion_point(class_scope:tmp.DeviceOperation)
+  # @@protoc_insertion_point(class_scope:command.DeviceOperation)
   })
 _sym_db.RegisterMessage(DeviceOperation)
 
@@ -48,12 +48,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'Z\n../command'
-  _OPERATECODE._serialized_start=191
-  _OPERATECODE._serialized_end=289
-  _OPERATION._serialized_start=22
-  _OPERATION._serialized_end=118
-  _OPERATION_TYPE._serialized_start=84
-  _OPERATION_TYPE._serialized_end=118
-  _DEVICEOPERATION._serialized_start=120
-  _DEVICEOPERATION._serialized_end=189
+  _OPERATECODE._serialized_start=199
+  _OPERATECODE._serialized_end=297
+  _OPERATION._serialized_start=26
+  _OPERATION._serialized_end=126
+  _OPERATION_TYPE._serialized_start=92
+  _OPERATION_TYPE._serialized_end=126
+  _DEVICEOPERATION._serialized_start=128
+  _DEVICEOPERATION._serialized_end=197
 # @@protoc_insertion_point(module_scope)
