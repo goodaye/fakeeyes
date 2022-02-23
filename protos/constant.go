@@ -4,8 +4,11 @@ package protos
 var DevicePlatform = struct {
 	// Mac
 	Darwin string
+	// Linux
+	Linux string
 }{
 	Darwin: "darwin",
+	Linux:  "linux",
 }
 
 var APIName = struct {
