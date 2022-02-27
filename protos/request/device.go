@@ -6,6 +6,7 @@ type DeviceInfo struct {
 	Name         string `json:"name" validate:"required"`
 	ModelName    string `json:"model_name" `
 	ModelID      string `json:"model_id" `
+	CPUModel     string `json:"cpu_model" `
 	CPUModelID   string `json:"cpu_model_id"`
 	CPUSpeed     string `json:"cpu_speed" `
 	CPUArch      string `json:"cpu_arch" `
